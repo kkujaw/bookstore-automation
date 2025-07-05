@@ -17,8 +17,12 @@ jobs:
           distribution: 'adopt'
       - name: Build and Test
         run: mvn clean test
-      - name: Archive Test Results
+      - name: Generate Surefire HTML report
+        if: always()
+        run: mvn surefire-report:report-only
+      - name: Upload Surefire HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: target/surefire-reports/
+          name: surefire-report
+          path: target/site/surefire-report.html

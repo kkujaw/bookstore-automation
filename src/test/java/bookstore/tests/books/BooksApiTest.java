@@ -1,0 +1,175 @@
+package bookstore.tests.books;
+
+import bookstore.models.Book;
+import bookstore.tests.BaseTest;
+import bookstore.utils.ApiClient;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import io.restassured.response.Response;
+import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Stream;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+/**
+ * Tests for the Authors API.
+ * Covers CRUD operations and edge cases.
+ */
+public class BooksApiTest extends BaseTest {
+
+    // 1. GET /api/v1/Books – Retrieve a list of all books.
+    @Test
+    void getAllBooks_shouldReturnListOfBooks() {
+        ApiClient.getRequestSpec()
+                .get("/Books")
+                .then()
+                .statusCode(200)
+                .body("$", not(empty()))
+                .body(matchesJsonSchemaInClasspath("fakeRestApiSchema.json"));
+    }
+
+    // 2. GET /api/v1/Books/{id} – Retrieve details of a specific book by its ID.
+    @Test
+    void getBook_id_shouldReturn_ok() {
+        int bookId = 1; // Assuming book with ID 1 exists
+        ApiClient.getRequestSpec()
+                .get("/Books/" + bookId)
+                .then()
+                .statusCode(200)
+                .body("$", not(empty()))
+                .body("id", is(bookId));
+    }
+
+    @Test
+    void getBook_invalidId_shouldReturn_error() {
+        ApiClient.getRequestSpec()
+                .get("/Books/99999")
+                .then()
+                .statusCode(404)
+                .body("title", is("Not Found"));
+    }
+
+    // 3. POST /api/v1/Books – Add a new book to the system.
+    @ParameterizedTest
+    @MethodSource("bookProvider")
+    void createBook_shouldReturn_ok(Map<String, Object> book) {
+        ApiClient.getRequestSpec()
+                .body(book)
+                .post("/Books")
+                .then()
+                .statusCode(is(200))
+                .body(is(not(empty())), is(notNullValue()))
+                .body("id", is(0))
+                .body("title", is(book.get("title")))
+                .body("description", is(book.get("description")))
+                .body("pageCount", is(book.get("pageCount")))
+                .body("excerpt", is(book.get("excerpt")))
+                .body("publishDate", is(book.get("publishDate")));
+    }
+
+    @Test
+    void createBook_withEmptyBody_shouldReturn_error() {
+        ApiClient.getRequestSpec()
+                .body("")
+                .post("/Books")
+                .then()
+                .statusCode(is(400))
+                .body("errors.\"\"", hasItem("A non-empty request body is required."));
+    }
+
+    // 4. PUT /api/v1/Books/{id} – Update an existing book by its ID.
+    @ParameterizedTest
+    @MethodSource("bookProvider")
+    void updateBookDetails_shouldReturnOk(Map<String, Object> book) {
+        String updatedTitle = "Updated Title";
+        String updatedDescription = "Updated Description";
+        int bookId = 1; // Assuming book with ID 1 exists
+
+        // Get existing Book Details
+        Response oldBook = ApiClient.getRequestSpec()
+                .get("/Books/" + bookId)
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        Book existingBook = oldBook.as(Book.class);
+
+        // Update Book Details
+        book.put("id", existingBook.id);
+        book.put("title", updatedTitle);
+        book.put("description", updatedDescription);
+        book.put("pageCount", existingBook.pageCount);
+        book.put("excerpt", existingBook.excerpt);
+        book.put("publishDate", existingBook.publishDate);
+
+        ApiClient.getRequestSpec()
+                .body(book)
+                .put("/Books/" + existingBook.id)
+                .then()
+                .statusCode(200)
+                .body("id", is(existingBook.id))
+                .body("title", is(updatedTitle))
+                .body("description", is(updatedDescription));
+    }
+
+    @Test
+    void updateBookDetails_invalidId_shouldReturnError() {
+        String wrongId = "wrongId";
+        assertInvalidIdError(ApiClient.getRequestSpec()
+                        .body("{}")
+                        .put("/Books/" + wrongId)
+                        .then()
+                        .statusCode(400)
+                , wrongId);
+    }
+
+    // 5. DELETE /api/v1/Books/{id} – Delete a book by its ID.
+    @ParameterizedTest
+    @MethodSource("bookProvider")
+    void deleteBook_shouldReturnOk(Map<String, Object> book) {
+        // Create a book first
+        Response createdBook = ApiClient.getRequestSpec()
+                .body(book)
+                .post("/Books")
+                .then()
+                .statusCode(is(200))
+                .extract().response();
+        Book bookToDelete = createdBook.as(Book.class);
+
+        // Delete
+        ApiClient.getRequestSpec()
+                .delete("/Books/" + bookToDelete.id)
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    void deleteBook_withInvalidId_shouldReturnError() {
+        String wrongId = "wrongId";
+        assertInvalidIdError(ApiClient.getRequestSpec()
+                        .delete("/Books/" + wrongId)
+                        .then()
+                        .statusCode(400)
+                , wrongId);
+    }
+
+    @Test
+    void deleteBook_withEmptyId_shouldReturnError() {
+        ApiClient.getRequestSpec()
+                .delete("/Books/")
+                .then()
+                .statusCode(405)
+                .body(is(emptyOrNullString()));
+    }
+
+    static Stream<Map<String, Object>> bookProvider() throws IOException {
+        return Stream.of(loadBookFromJson("testdata/tempBook.json"));
+    }
+}
