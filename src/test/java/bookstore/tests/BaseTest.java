@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.Matchers.hasItem;
 
 public class BaseTest {
-    private static final String BASE_URL = System.getProperty("base.url", "https://fakerestapi.azurewebsites.net/api/v1");
+    public static final String BASE_URL = System.getProperty("base.url", "https://fakerestapi.azurewebsites.net/api/v1");
 
     @BeforeAll
     static void setupRestAssured() {
