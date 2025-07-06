@@ -2,7 +2,6 @@ package bookstore.tests.authors;
 
 import bookstore.models.Author;
 import bookstore.tests.BaseTest;
-import bookstore.utils.ApiClient;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,7 +27,7 @@ public class AuthorsApiTest extends BaseTest {
     // 1. GET /api/v1/Authors– Retrieve a list of all authors.
     @Test
     void getAllAuthors_shouldReturnListOfAuthors() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .get("/Authors")
                 .then()
                 .statusCode(200)
@@ -40,7 +39,7 @@ public class AuthorsApiTest extends BaseTest {
     // 2. GET /api/v1/Authors/{id}– Retrieve details of a specific author by their ID.
     @Test
     void getAuthor_id_shouldReturn_ok() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .get("/Authors/1")
                 .then()
                 .statusCode(200)
@@ -51,7 +50,7 @@ public class AuthorsApiTest extends BaseTest {
 
     @Test
     void getAuthor_invalidId_shouldReturn_error() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .get("/Authors/1223")
                 .then()
                 .statusCode(404)
@@ -63,7 +62,7 @@ public class AuthorsApiTest extends BaseTest {
     @ParameterizedTest
     @MethodSource("authorProvider")
     void createAuthor_shouldReturn_ok(Map<String, Object> author) {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .body(author)
                 .post("/Authors")
                 .then()
@@ -78,7 +77,7 @@ public class AuthorsApiTest extends BaseTest {
 
     @Test
     void createAuthor_withEmptyBody_shouldReturn_error() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .body("")
                 .post("/Authors")
                 .then()
@@ -90,7 +89,7 @@ public class AuthorsApiTest extends BaseTest {
     // 4. PUT /api/v1/Authors/{id}– Update an existing author’s details.
     @Test
     void updateAuthorDetails_shouldReturnOk() {
-        Response author = ApiClient.getRequestSpec()
+        Response author = getRequestSpec()
                 .get("/Authors/1")
                 .then()
                 .statusCode(200)
@@ -102,7 +101,7 @@ public class AuthorsApiTest extends BaseTest {
         update.put("idBook", existingAuthor.idBook);
         update.put("firstName", "UpdatedFirstName");
         update.put("lastName", "UpdatedLastName");
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .body(update)
                 .put("/Authors/" + existingAuthor.id)
                 .then()
@@ -116,7 +115,7 @@ public class AuthorsApiTest extends BaseTest {
     @Test
     void updateAuthorDetails_invalidId_shouldReturnError() {
         String wrongId = "wrongId";
-        assertInvalidIdError(ApiClient.getRequestSpec()
+        assertInvalidIdError(getRequestSpec()
                         .body("{}")
                         .put("/Authors/" + wrongId)
                         .then()
@@ -129,7 +128,7 @@ public class AuthorsApiTest extends BaseTest {
     @ParameterizedTest
     @MethodSource("authorProvider")
     void deleteAuthor_shouldReturnOk(Map<String, Object> author) {
-        Response createdAuthor = ApiClient.getRequestSpec()
+        Response createdAuthor = getRequestSpec()
                 .body(author)
                 .post("/Authors")
                 .then()
@@ -137,7 +136,7 @@ public class AuthorsApiTest extends BaseTest {
                 .extract().response();
         Author authorToDelete = createdAuthor.as(Author.class);
 
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .delete("/Authors/" + authorToDelete.id)
                 .then()
                 .statusCode(200);
@@ -147,7 +146,7 @@ public class AuthorsApiTest extends BaseTest {
     void deleteAuthor_withInvalidId_shouldReturnError() {
         String wrongId = "wrongId";
         assertInvalidIdError(
-                ApiClient.getRequestSpec()
+                getRequestSpec()
                         .delete("/Authors/" + wrongId)
                         .then()
                         .statusCode(400),
@@ -157,7 +156,7 @@ public class AuthorsApiTest extends BaseTest {
 
     @Test
     void deleteAuthor_withEmptyId_shouldReturnError() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .delete("/Authors/")
                 .then()
                 .statusCode(405);

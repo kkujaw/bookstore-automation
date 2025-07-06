@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.IOException;
@@ -18,6 +19,11 @@ public class BaseTest {
     @BeforeAll
     static void setupRestAssured() {
         RestAssured.baseURI = BASE_URL;
+    }
+
+    public static RequestSpecification getRequestSpec() {
+        return RestAssured.given()
+                .header("Content-Type", "application/json");
     }
 
     public void assertInvalidIdError(ValidatableResponse response, String id) {

@@ -2,7 +2,6 @@ package bookstore.tests.books;
 
 import bookstore.models.Book;
 import bookstore.tests.BaseTest;
-import bookstore.utils.ApiClient;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,7 +27,7 @@ public class BooksApiTest extends BaseTest {
     // 1. GET /api/v1/Books – Retrieve a list of all books.
     @Test
     void getAllBooks_shouldReturnListOfBooks() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .get("/Books")
                 .then()
                 .statusCode(200)
@@ -40,7 +39,7 @@ public class BooksApiTest extends BaseTest {
     @Test
     void getBook_id_shouldReturn_ok() {
         int bookId = 1; // Assuming book with ID 1 exists
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .get("/Books/" + bookId)
                 .then()
                 .statusCode(200)
@@ -51,7 +50,7 @@ public class BooksApiTest extends BaseTest {
 
     @Test
     void getBook_invalidId_shouldReturn_error() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .get("/Books/99999")
                 .then()
                 .statusCode(404)
@@ -62,7 +61,7 @@ public class BooksApiTest extends BaseTest {
     @ParameterizedTest
     @MethodSource("bookProvider")
     void createBook_shouldReturn_ok(Map<String, Object> book) {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .body(book)
                 .post("/Books")
                 .then()
@@ -79,7 +78,7 @@ public class BooksApiTest extends BaseTest {
 
     @Test
     void createBook_withEmptyBody_shouldReturn_error() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .body("")
                 .post("/Books")
                 .then()
@@ -96,7 +95,7 @@ public class BooksApiTest extends BaseTest {
         int bookId = 1; // Assuming book with ID 1 exists
 
         // Get existing Book Details
-        Response oldBook = ApiClient.getRequestSpec()
+        Response oldBook = getRequestSpec()
                 .get("/Books/" + bookId)
                 .then()
                 .statusCode(200)
@@ -112,7 +111,7 @@ public class BooksApiTest extends BaseTest {
         book.put("excerpt", existingBook.excerpt);
         book.put("publishDate", existingBook.publishDate);
 
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .body(book)
                 .put("/Books/" + existingBook.id)
                 .then()
@@ -125,7 +124,7 @@ public class BooksApiTest extends BaseTest {
     @Test
     void updateBookDetails_invalidId_shouldReturnError() {
         String wrongId = "wrongId";
-        assertInvalidIdError(ApiClient.getRequestSpec()
+        assertInvalidIdError(getRequestSpec()
                         .body("{}")
                         .put("/Books/" + wrongId)
                         .then()
@@ -138,7 +137,7 @@ public class BooksApiTest extends BaseTest {
     @MethodSource("bookProvider")
     void deleteBook_shouldReturnOk(Map<String, Object> book) {
         // Create a book first
-        Response createdBook = ApiClient.getRequestSpec()
+        Response createdBook = getRequestSpec()
                 .body(book)
                 .post("/Books")
                 .then()
@@ -147,7 +146,7 @@ public class BooksApiTest extends BaseTest {
         Book bookToDelete = createdBook.as(Book.class);
 
         // Delete
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .delete("/Books/" + bookToDelete.id)
                 .then()
                 .statusCode(200);
@@ -156,7 +155,7 @@ public class BooksApiTest extends BaseTest {
     @Test
     void deleteBook_withInvalidId_shouldReturnError() {
         String wrongId = "wrongId";
-        assertInvalidIdError(ApiClient.getRequestSpec()
+        assertInvalidIdError(getRequestSpec()
                         .delete("/Books/" + wrongId)
                         .then()
                         .statusCode(400)
@@ -165,7 +164,7 @@ public class BooksApiTest extends BaseTest {
 
     @Test
     void deleteBook_withEmptyId_shouldReturnError() {
-        ApiClient.getRequestSpec()
+        getRequestSpec()
                 .delete("/Books/")
                 .then()
                 .statusCode(405)
