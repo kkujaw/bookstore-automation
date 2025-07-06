@@ -17,12 +17,14 @@ jobs:
           distribution: 'adopt'
       - name: Build and Test
         run: mvn clean test
-      - name: Generate Surefire HTML report
+
+      - name: Generate Allure report
         if: always()
-        run: mvn surefire-report:report-only
-      - name: Upload Surefire HTML report
+        run: mvn allure:report
+
+      - name: Upload Allure report artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: surefire-report
-          path: target/reports
+          name: allure-report
+          path: target/allure-report
