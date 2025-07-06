@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -173,7 +172,7 @@ public class BooksApiTest extends BaseTest {
                 .body(is(emptyOrNullString()));
     }
 
-    static Stream<Map<String, Object>> bookProvider() throws IOException {
-        return Stream.of(loadBookFromJson("testdata/tempBook.json"));
+    static Stream<Map<String, Object>> bookProvider() {
+        return dataProvider("testdata/tempBook.json");
     }
 }

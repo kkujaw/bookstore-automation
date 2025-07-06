@@ -1,7 +1,6 @@
 {
-  "title": "Temp Book",
-  "description": "To be deleted",
-  "pageCount": 10,
-  "excerpt": "Temp...",
-  "publishDate": "2024-01-01T00:00:00"
+  "id": 1122,
+  "idBook": 1223,
+  "firstName": "Ghost",
+  "lastName": "Writer"
 }

@@ -69,7 +69,7 @@ public class AuthorsApiTest extends BaseTest {
                 .then()
                 .statusCode(is(200))
                 .body(is(not(empty())), is(notNullValue()))
-                .body("id", is(0))
+                .body("id", is(author.get("id")))
                 .body("idBook", is(author.get("idBook")))
                 .body("firstName", is(author.get("firstName")))
                 .body("lastName", is(author.get("lastName")))
@@ -164,10 +164,6 @@ public class AuthorsApiTest extends BaseTest {
     }
 
     static Stream<Map<String, Object>> authorProvider() {
-        Map<String, Object> author = new HashMap<>();
-        author.put("idBook", 1223);
-        author.put("firstName", "Ghost");
-        author.put("lastName", "Writer");
-        return Stream.of(author);
+        return dataProvider("testdata/tempAuthor.json");
     }
 }
