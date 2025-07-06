@@ -9,7 +9,8 @@
 
 ## Technologies
 
-- Java, Spring Boot
+- Java 17
+- RestAssured framework for API testing
 - JUnit 5 (Jupiter) for testing
 - Allure for test reporting
 - Maven for build and dependency management
@@ -34,15 +35,11 @@
    ```bash
    mvn allure:report
 
+The generated report will be available in ```target/allure-test-report/index.html```.
+
 4. Serve Allure report locally:
    ```bash
    mvn allure:serve
-
-The generated report will be available in ```target/allure-test-report/index.html```.
-
-For interactive viewing, use:
-    ```bash
-    mvn allure:serve
 
 This will start a local server and open the report in your default web browser under the provided local URL.
 
