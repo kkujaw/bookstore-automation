@@ -25,4 +25,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: surefire-report
-          path: target/site/surefire-report.html
+          path: target/reports/surefire.html
