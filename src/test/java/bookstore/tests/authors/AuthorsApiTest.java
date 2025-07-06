@@ -45,7 +45,8 @@ public class AuthorsApiTest extends BaseTest {
                 .then()
                 .statusCode(200)
                 .body("$", not(empty()))
-                .body("id", is(1));
+                .body("id", is(1))
+                .body(matchesJsonSchemaInClasspath("fakeRestApiSchema.json"));
     }
 
     @Test
@@ -71,7 +72,8 @@ public class AuthorsApiTest extends BaseTest {
                 .body("id", is(0))
                 .body("idBook", is(author.get("idBook")))
                 .body("firstName", is(author.get("firstName")))
-                .body("lastName", is(author.get("lastName")));
+                .body("lastName", is(author.get("lastName")))
+                .body(matchesJsonSchemaInClasspath("fakeRestApiSchema.json"));
     }
 
     @Test
