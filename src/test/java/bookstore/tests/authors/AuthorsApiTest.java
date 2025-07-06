@@ -94,13 +94,15 @@ public class AuthorsApiTest extends BaseTest {
                 .then()
                 .statusCode(200)
                 .extract().response();
+        var updatedFirstName = "UpdatedFirstName";
+        var updatedLastName = "UpdatedFirstName";
 
         Author existingAuthor = author.as(Author.class);
         Map<String, Object> update = new HashMap<>();
         update.put("id", existingAuthor.id);
         update.put("idBook", existingAuthor.idBook);
-        update.put("firstName", "UpdatedFirstName");
-        update.put("lastName", "UpdatedLastName");
+        update.put("firstName", updatedFirstName);
+        update.put("lastName", updatedLastName);
         getRequestSpec()
                 .body(update)
                 .put("/Authors/" + existingAuthor.id)
@@ -108,8 +110,19 @@ public class AuthorsApiTest extends BaseTest {
                 .statusCode(200)
                 .body("id", is(existingAuthor.id))
                 .body("idBook", is(existingAuthor.idBook))
-                .body("firstName", is("UpdatedFirstName"))
-                .body("lastName", is("UpdatedLastName"));
+                .body("firstName", is(updatedFirstName))
+                .body("lastName", is(updatedFirstName));
+
+        // Validate that updated author data is correct - GET the author again - simulate bug detection
+        getRequestSpec()
+                .get("/Authors/" + existingAuthor.id)
+                .then()
+                .statusCode(200)
+                .body(matchesJsonSchemaInClasspath("fakeRestApiSchema.json"))
+                .body("id", is(existingAuthor.id))
+                .body("idBook", is(existingAuthor.idBook))
+                .body("firstName", is(updatedFirstName))
+                .body("lastName", is(updatedFirstName));
     }
 
     @Test

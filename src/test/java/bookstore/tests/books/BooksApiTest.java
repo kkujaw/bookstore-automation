@@ -92,7 +92,7 @@ public class BooksApiTest extends BaseTest {
     void updateBookDetails_shouldReturnOk(Map<String, Object> book) {
         String updatedTitle = "Updated Title";
         String updatedDescription = "Updated Description";
-        int bookId = 1; // Assuming book with ID 1 exists
+        int bookId = 1; // Assuming a book with ID 1 exists
 
         // Get existing Book Details
         Response oldBook = getRequestSpec()
