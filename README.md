@@ -1,34 +1,63 @@
-# allwyn-assesment-java
-
-API Automation Testing Assessment: Online Bookstore - Java Implementation
-
 # Bookstore API Automation
 
-## Prerequisites
+## Project Structure
 
-- Java 17+
-- Maven 3.8+
+- Main code: `src/main/java`
+- Test code: `src/test/java`
+- Build tool: Maven (`pom.xml`)
+- CI workflow: `.github/workflows/bookstore-ci.yml`
 
-## Setup
+## Technologies
 
-```bash
-git clone <repo-url>
-```
+- Java, Spring Boot
+- JUnit 5 (Jupiter) for testing
+- Allure for test reporting
+- Maven for build and dependency management
 
-```bash
-cd bookstore-api-automation
-```
+## Writing and Running Tests
 
-```bash
-mvn clean install
-```
+- Test classes are located in `src/test/java` and named `*Test.java` or `*Tests.java`.
+- Use JUnit 5 annotations for tests.
+- Allure annotations can be added for enhanced reporting.
 
-## Running Tests
+### Run Tests Locally
 
-```bash
-mvn test
-```
+1. Run all tests:
+   ```bash
+   mvn clean test
 
-## Test Reports
+2. Run tests and generate Allure results:
+   ```bash
+   mvn clean verify
 
-- Reports are generated in `target/surefire-reports/`
+3. Generate Allure report:
+   ```bash
+   mvn allure:report
+
+4. Serve Allure report locally:
+   ```bash
+   mvn allure:serve
+
+The generated report will be available in ```target/allure-test-report/index.html```.
+
+For interactive viewing, use:
+    ```bash
+    mvn allure:serve
+
+This will start a local server and open the report in your default web browser under the provided local URL.
+
+
+## Continuous Integration (CI)
+
+Configured in ```.github/workflows/bookstore-ci.yml``` using GitHub Actions.
+On every push or pull request to main:
+- Checks out the code
+- Sets up JDK 17
+- Runs mvn clean verify to build and test
+- Generates Allure report (mvn allure:report)
+- Uploads the Allure report as an artifact (target/allure-test-report)
+
+### Accessing Reports
+- __CI__: Download the Allure report artifact from the GitHub Actions run summary.
+- __Local__: After running mvn allure:report, open target/allure-test-report/index.html.
+- __Serve locally__: Use mvn allure:serve for an interactive report.
