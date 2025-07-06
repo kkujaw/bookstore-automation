@@ -16,9 +16,15 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Build and Test
-        run: mvn clean test
-      - name: Archive Test Results
+        run: mvn clean verify
+
+      - name: Generate Allure report
+        if: always()
+        run: mvn allure:report
+
+      - name: Upload Allure report artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: target/surefire-reports/
+          name: allure-report
+          path: target/allure-test-report
